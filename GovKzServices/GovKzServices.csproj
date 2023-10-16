@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>11.0</LangVersion>
+  </PropertyGroup>
+
+  <Target Name="NSwag" AfterTargets="Build">
+    <Exec Command="$(NSwagExe) openapi2csclient /input:swagger.json /output:QazStatClient.cs /JsonLibrary:SystemTextJson /Namespace:GovKzServices /ClassName:QazStatClient /GenerateDataAnnotations:false" />
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="NSwag.MSBuild" Version="13.20.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageReference Include="System.Text.Json" Version="7.0.3" />
+  </ItemGroup>
+
+</Project>
