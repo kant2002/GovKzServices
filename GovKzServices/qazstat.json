@@ -1,0 +1,415 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "QAZ Stat API",
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://stat.gov.kz/api"
+    }
+  ],
+  "paths": {
+    "/juridical": {
+      "get": {
+        "summary": "Get information about juridical entity",
+        "operationId": "getJuridical",
+        "tags": [
+          "juridical"
+        ],
+        "parameters": [
+          {
+            "name": "bin",
+            "in": "query",
+            "description": "BIN or IIN to lookup",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "description": "Language in which return results (ru, kz, en)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Information about juridical entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JuridicalEntityResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sbr/request": {
+      "post": {
+        "summary": "Search list of juridical entities",
+        "operationId": "requestJuridicalEntitySearch",
+        "tags": [
+          "juridical"
+        ],
+        "parameters": [
+          {
+            "name": "juridicalEntitySearchRequest",
+            "in": "body",
+            "description": "Language in which return results (ru, kz, en)",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "conditions": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RequestCondition"
+                  }
+                },
+                "cutId": {
+                  "type": "number",
+                  "format": "int32"
+                },
+                "stringForMD5": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Information about juridical entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JuridicalEntitySearchRequestResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sbr/requestResult/:requestId/:lang": {
+      "get": {
+        "summary": "Get information about juridical entity",
+        "operationId": "getJuridicalSearchStatus",
+        "tags": [
+          "juridical"
+        ],
+        "parameters": [
+          {
+            "name": "requestId",
+            "in": "path",
+            "description": "Id of the search request for which get file",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "path",
+            "description": "Language in which return results (ru, kz, en)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status of juridical entity search",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JuridicalSearchStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "local/components/statdata/juridical.filter/templates/v2/ajax_data.php": {
+      "get": {
+        "summary": "Get information about reference data",
+        "operationId": "getStatData",
+        "tags": [
+          "reference"
+        ],
+        "parameters": [
+          {
+            "name": "dictId",
+            "in": "query",
+            "description": "Id of the dictionary for which return result",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "parent",
+            "in": "query",
+            "description": "Tree path ",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "description": "Language in which return results (ru, kz, en)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "withParents",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Collection of tree items one level beneath selected path",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TreeItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "JuridicalEntityResponse": {
+        "type": "object",
+        "required": [
+          "success"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": "string"
+          },
+          "obj": {
+            "$ref": "#/components/schemas/JuridicalEntity"
+          }
+        }
+      },
+      "JuridicalSearchStatusResponse": {
+        "type": "object",
+        "required": [
+          "success"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": "string"
+          },
+          "obj": {
+            "$ref": "#/components/schemas/JuridicalSearchStatus"
+          }
+        }
+      },
+      "JuridicalEntity": {
+        "type": "object",
+        "required": [
+          "bin",
+          "fio",
+          "ip",
+          "katoAddress",
+          "katoCode",
+          "katoId",
+          "kfsCode",
+          "kfsName",
+          "krpBfCode",
+          "krpBfName",
+          "krpCode",
+          "krpName",
+          "kseCode",
+          "kseName",
+          "name",
+          "okedCode",
+          "okedName",
+          "registerDate"
+        ],
+        "properties": {
+          "bin": {
+            "type": "string"
+          },
+          "fio": {
+            "type": "string"
+          },
+          "ip": {
+            "type": "boolean"
+          },
+          "katoAddress": {
+            "type": "string"
+          },
+          "katoCode": {
+            "type": "string"
+          },
+          "katoId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "kfsCode": {
+            "type": "string"
+          },
+          "kfsName": {
+            "type": "string"
+          },
+          "krpBfCode": {
+            "type": "string"
+          },
+          "krpBfName": {
+            "type": "string"
+          },
+          "krpCode": {
+            "type": "string"
+          },
+          "krpName": {
+            "type": "string"
+          },
+          "kseCode": {
+            "type": "string"
+          },
+          "kseName": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "okedCode": {
+            "type": "string"
+          },
+          "okedName": {
+            "type": "string"
+          },
+          "registerDate": {
+            "type": "string"
+          }
+        }
+      },
+      "TreeItemCollection": {
+        "type": "aray",
+        "items": {
+          "$ref": "#/components/schemas/TreeItem"
+        }
+      },
+      "TreeItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "text",
+          "children",
+          "type"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "text": {
+            "type": "string"
+          },
+          "children": {
+            "type": "boolean"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "JuridicalEntitySearchRequestResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "obj"
+        ],
+        "properties": {
+          "obj": {
+            "type": "string"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "RequestCondition": {
+        "type": "object",
+        "required": [
+          "success",
+          "obj"
+        ],
+        "properties": {
+          "classVersionId": {
+            "type": "number",
+            "format": "int32"
+          },
+          "itemIds": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "int32"
+            }
+          }
+        }
+      },
+      "JuridicalSearchStatus": {
+        "type": "object",
+        "required": [
+          "success",
+          "obj"
+        ],
+        "properties": {
+          "id": {
+            "type": "number",
+            "format": "int32"
+          },
+          "fileGuid": {
+            "type": "string"
+          },
+          "bucket": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
