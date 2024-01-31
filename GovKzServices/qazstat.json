@@ -27,8 +27,7 @@
             "description": "BIN or IIN to lookup",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string"
             }
           },
           {

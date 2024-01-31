@@ -60,7 +60,7 @@ namespace GovKzServices
         /// <param name="lang">Language in which return results (ru, kz, en)</param>
         /// <returns>Information about juridical entity</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<JuridicalEntityResponse> GetJuridicalAsync(long bin, string lang)
+        public virtual System.Threading.Tasks.Task<JuridicalEntityResponse> GetJuridicalAsync(string bin, string lang)
         {
             return GetJuridicalAsync(bin, lang, System.Threading.CancellationToken.None);
         }
@@ -73,7 +73,7 @@ namespace GovKzServices
         /// <param name="lang">Language in which return results (ru, kz, en)</param>
         /// <returns>Information about juridical entity</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<JuridicalEntityResponse> GetJuridicalAsync(long bin, string lang, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<JuridicalEntityResponse> GetJuridicalAsync(string bin, string lang, System.Threading.CancellationToken cancellationToken)
         {
             if (bin == null)
                 throw new System.ArgumentNullException("bin");
@@ -209,6 +209,98 @@ namespace GovKzServices
                         if (status_ == 200)
                         {
                             var objectResponse_ = await ReadObjectResponseAsync<JuridicalEntitySearchRequestResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Get information about juridical entity
+        /// </summary>
+        /// <param name="requestId">Id of the search request for which get file</param>
+        /// <param name="lang">Language in which return results (ru, kz, en)</param>
+        /// <returns>Status of juridical entity search</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<JuridicalSearchStatusResponse> GetJuridicalSearchStatusAsync(string requestId, string lang)
+        {
+            return GetJuridicalSearchStatusAsync(requestId, lang, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Get information about juridical entity
+        /// </summary>
+        /// <param name="requestId">Id of the search request for which get file</param>
+        /// <param name="lang">Language in which return results (ru, kz, en)</param>
+        /// <returns>Status of juridical entity search</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<JuridicalSearchStatusResponse> GetJuridicalSearchStatusAsync(string requestId, string lang, System.Threading.CancellationToken cancellationToken)
+        {
+            if (requestId == null)
+                throw new System.ArgumentNullException("requestId");
+
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/sbr/requestResult/:requestId/:lang");
+            urlBuilder_.Replace("{requestId}", System.Uri.EscapeDataString(ConvertToString(requestId, System.Globalization.CultureInfo.InvariantCulture)));
+            if (lang != null)
+                urlBuilder_.Replace("{lang}", System.Uri.EscapeDataString(ConvertToString(lang, System.Globalization.CultureInfo.InvariantCulture)));
+            else
+                urlBuilder_.Replace("/{lang}", string.Empty);
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<JuridicalSearchStatusResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -469,6 +561,36 @@ namespace GovKzServices
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v11.0.0.0))")]
+    public partial class JuridicalSearchStatusResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("success")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        public bool Success { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public string Description { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("obj")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public JuridicalSearchStatus Obj { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v11.0.0.0))")]
     public partial class JuridicalEntity
     {
 
@@ -666,6 +788,36 @@ namespace GovKzServices
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public System.Collections.Generic.ICollection<double> ItemIds { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v11.0.0.0))")]
+    public partial class JuridicalSearchStatus
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public double Id { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("fileGuid")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public string FileGuid { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("bucket")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public string Bucket { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
